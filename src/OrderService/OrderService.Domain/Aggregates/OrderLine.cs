@@ -1,8 +1,8 @@
 using OrderService.Domain.Abstractions;
-using AppId = OrderService.Domain.ValueObjects.ApplicationId;
 using OrderService.Domain.ValueObjects;
+using AppId = OrderService.Domain.ValueObjects.ApplicationId;
 
-namespace OrderService.Domain.Entities;
+namespace OrderService.Domain.Aggregates;
 
 public sealed class OrderLine : Entity<Guid>
 {

@@ -1,5 +1,4 @@
 using OrderService.Domain.Abstractions;
-using OrderService.Domain.Entities;
 using OrderService.Domain.Enums;
 using OrderService.Domain.Events;
 using OrderService.Domain.ValueObjects;

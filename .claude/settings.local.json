@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(dotnet add:*)",
-      "Bash(dotnet build:*)"
+      "Bash(dotnet build:*)",
+      "Bash(dotnet new:*)",
+      "Bash(dotnet sln:*)",
+      "Bash(rm \"OrderService.Application/Class1.cs\")",
+      "Bash(dotnet restore:*)"
     ]
   }
 }
