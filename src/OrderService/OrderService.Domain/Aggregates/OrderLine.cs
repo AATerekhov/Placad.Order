@@ -24,7 +24,7 @@ public sealed class OrderLine : Entity<Guid>
         Price = price;
     }
 
-    private OrderLine() : base(Guid.Empty)
+    private OrderLine() : base(Guid.Empty) //EF Core
     {
         ProductId = null!;
         ProductName = null!;

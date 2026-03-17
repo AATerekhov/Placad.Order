@@ -8,20 +8,19 @@ namespace OrderService.Domain.Aggregates;
 
 public sealed class Order : AggregateRoot<OrderId>
 {
-    private readonly List<OrderLine> _orderLines = [];
+    private List<OrderLine> _orderLines = [];
 
     public CustomerId CustomerId { get; private set; }
     public OrderStatus Status { get; private set; }
-    public IReadOnlyList<OrderLine> OrderLines => _orderLines.AsReadOnly();
-    public Money TotalAmount { get; private set; }
+    public IReadOnlyCollection<OrderLine> OrderLines => _orderLines;
+    public Money TotalAmount => _orderLines.Count == 0
+        ? Money.Zero("USD")
+        : Money.Of(_orderLines.Sum(l => l.Price.Amount), _orderLines[0].Price.Currency);
     public PaymentReference? PaymentReference { get; private set; }
     public DateTime CreatedAt { get; private set; }
+    public byte[] RowVersion { get; private set; } = default!;
 
-    private Order() :base(OrderId.New())
-    {
-        CustomerId = null!;
-        TotalAmount = null!;
-    }
+    private Order() : base(OrderId.New()) { CustomerId = null!; } // EF Core
 
     private Order(
         OrderId id,
@@ -29,7 +28,6 @@ public sealed class Order : AggregateRoot<OrderId>
     {
         CustomerId = customerId;
         Status = OrderStatus.Pending;
-        TotalAmount = Money.Zero("USD");
         CreatedAt = DateTime.UtcNow;
     }
 
@@ -50,20 +48,19 @@ public sealed class Order : AggregateRoot<OrderId>
         return order;
     }
 
-    public void AddOrderLine(OrderLine line)
-    {
-        _orderLines.Add(line);
-        TotalAmount = TotalAmount.Add(line.Price);
-    }
+    private void AddOrderLine(OrderLine line) => _orderLines.Add(line);
 
     public void Confirm(PaymentReference paymentReference)
     {
         if (Status != OrderStatus.Pending)
             throw new InvalidOperationException($"Cannot confirm an order in '{Status}' status.");
 
+        if (Status == OrderStatus.Pending && _orderLines.Count == 0)
+            throw new InvalidOperationException("Paid order cannot be empty.");
+
         Status = OrderStatus.Confirmed;
         PaymentReference = paymentReference;
-        RaiseDomainEvent(new OrderConfirmed(Id, paymentReference, DateTime.UtcNow));
+        RaiseDomainEvent(new OrderConfirmedDomainEvent(Id, paymentReference, DateTime.UtcNow));
     }
 
     public void Fail(string reason)
@@ -72,7 +69,7 @@ public sealed class Order : AggregateRoot<OrderId>
             throw new InvalidOperationException($"Cannot fail an order in '{Status}' status.");
 
         Status = OrderStatus.Failed;
-        RaiseDomainEvent(new OrderFailed(Id, reason, DateTime.UtcNow));
+        RaiseDomainEvent(new OrderFailedDomainEvent(Id, reason, DateTime.UtcNow));
     }
 
     public void Refund()
@@ -81,6 +78,6 @@ public sealed class Order : AggregateRoot<OrderId>
             throw new InvalidOperationException("Only confirmed orders can be refunded.");
 
         Status = OrderStatus.Failed;
-        RaiseDomainEvent(new OrderRefunded(Id, TotalAmount, DateTime.UtcNow));
+        RaiseDomainEvent(new OrderRefundedDomainEvent(Id, TotalAmount, DateTime.UtcNow));
     }
 }
