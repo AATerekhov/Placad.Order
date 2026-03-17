@@ -1,5 +1,4 @@
 using OrderService.Application.Abstractions;
-using OrderService.Domain.Enums;
 
 namespace OrderService.Application.Commands.PlaceOrder;
 

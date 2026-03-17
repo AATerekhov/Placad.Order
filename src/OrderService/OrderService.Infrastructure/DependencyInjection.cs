@@ -2,6 +2,7 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OrderService.Application.Abstractions;
 using OrderService.Domain.Repositories;
 using OrderService.Infrastructure.ExternalServices;
 using OrderService.Infrastructure.Messaging;
@@ -30,6 +31,7 @@ public static class DependencyInjection
 
         // Persistence
         services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<OrderDbContext>());
 
         // External services
         services.AddSingleton<CatalogServiceClient>();

@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using OrderService.Application.Abstractions;
 using OrderService.Domain.Aggregates;
 using OrderService.Infrastructure.Persistence.Outbox;
 
 namespace OrderService.Infrastructure.Persistence;
 
-public sealed class OrderDbContext : DbContext
+public sealed class OrderDbContext : DbContext, IUnitOfWork
 {
     public OrderDbContext(DbContextOptions<OrderDbContext> options) : base(options) { }
 
