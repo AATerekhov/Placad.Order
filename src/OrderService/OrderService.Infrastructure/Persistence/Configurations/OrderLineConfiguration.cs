@@ -27,6 +27,7 @@ internal sealed class OrderLineConfiguration : IEntityTypeConfiguration<OrderLin
             .IsRequired();
 
         builder.Property(ol => ol.Quantity)
+            .HasConversion(q => q.Value, v => Quantity.Of(v))
             .HasColumnName("quantity")
             .IsRequired();
 

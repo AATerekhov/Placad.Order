@@ -26,7 +26,7 @@ internal sealed class GetOrderQueryHandler : IRequestHandler<GetOrderQuery, Orde
             l.Id,
             l.ProductId.Value,
             l.ProductName,
-            l.Quantity,
+            l.Quantity.Value,
             l.Price.Amount,
             l.Price.Currency)).ToList(),
         o.TotalAmount.Amount,

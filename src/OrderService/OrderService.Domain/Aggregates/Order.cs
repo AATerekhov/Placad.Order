@@ -41,7 +41,7 @@ public sealed class Order : AggregateRoot<OrderId>
             order.AddOrderLine(OrderLine.Create(
                 ProdId.From(l.ProductId),
                 l.ProductName,
-                l.Quantity,
+                Quantity.Of(l.Quantity),
                 Money.Of(l.Amount, l.Currency)));
 
         order.RaiseDomainEvent(new OrderPlacedDomainEvent(order.Id, customerId, order.CreatedAt));
