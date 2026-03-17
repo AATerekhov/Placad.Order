@@ -1,6 +1,0 @@
-using OrderService.Domain.Abstractions;
-using OrderService.Domain.ValueObjects;
-
-namespace OrderService.Domain.Events;
-
-public sealed record OrderPlaced(OrderId OrderId, CustomerId CustomerId, DateTime PlacedAt) : DomainEvent;

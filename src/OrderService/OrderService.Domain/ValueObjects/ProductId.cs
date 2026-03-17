@@ -2,13 +2,13 @@ using OrderService.Domain.Abstractions;
 
 namespace OrderService.Domain.ValueObjects;
 
-public sealed class ApplicationId : ValueObject
+public sealed class ProductId : ValueObject
 {
     public Guid Value { get; }
 
-    private ApplicationId(Guid value) => Value = value;
+    private ProductId(Guid value) => Value = value;
 
-    public static ApplicationId From(Guid value)
+    public static ProductId From(Guid value)
     {
         if (value == Guid.Empty) throw new ArgumentException("ApplicationId cannot be empty.", nameof(value));
         return new(value);

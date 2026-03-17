@@ -1,47 +1,61 @@
 using OrderService.Domain.Abstractions;
 using OrderService.Domain.ValueObjects;
-using AppId = OrderService.Domain.ValueObjects.ApplicationId;
+using ProdId = OrderService.Domain.ValueObjects.ProductId;
 
 namespace OrderService.Domain.Aggregates;
 
 public sealed class OrderLine : Entity<Guid>
 {
-    public AppId ApplicationId { get; private set; }
-    public string ApplicationName { get; private set; }
-    public PlanId PlanId { get; private set; }
-    public string PlanName { get; private set; }
-    public string BillingCycle { get; private set; }
+    public ProdId ProductId { get; private set; }
+    public string ProductName { get; private set; }
+    public int Quantity { get; private set; }
     public Money Price { get; private set; }
 
     private OrderLine(
         Guid id,
-        AppId applicationId,
-        string applicationName,
-        PlanId planId,
-        string planName,
-        string billingCycle,
+        ProdId productId,
+        string productName,
+        int quantity,
         Money price) : base(id)
     {
-        ApplicationId = applicationId;
-        ApplicationName = applicationName;
-        PlanId = planId;
-        PlanName = planName;
-        BillingCycle = billingCycle;
+        ProductId = productId;
+        ProductName = productName;
+        Quantity = quantity;
         Price = price;
     }
 
+    private OrderLine() : base(Guid.Empty)
+    {
+        ProductId = null!;
+        ProductName = null!;
+        Quantity = 0;
+        Price = null!;
+    }
+
     public static OrderLine Create(
-        AppId applicationId,
-        string applicationName,
-        PlanId planId,
-        string planName,
-        string billingCycle,
+        ProdId productId,
+        string productName,
+        int quantity,
         Money price)
     {
-        if (string.IsNullOrWhiteSpace(applicationName)) throw new ArgumentException("ApplicationName is required.", nameof(applicationName));
-        if (string.IsNullOrWhiteSpace(planName)) throw new ArgumentException("PlanName is required.", nameof(planName));
-        if (string.IsNullOrWhiteSpace(billingCycle)) throw new ArgumentException("BillingCycle is required.", nameof(billingCycle));
+        if (string.IsNullOrWhiteSpace(productName)) throw new ArgumentException("ApplicationName is required.", nameof(productName));
+        if (quantity <= 0) throw new ArgumentOutOfRangeException(nameof(quantity),"Quantity must be greater than zero.");
 
-        return new(Guid.NewGuid(), applicationId, applicationName, planId, planName, billingCycle, price);
+        return new(Guid.NewGuid(), productId, productName, quantity, price);
+    }
+    internal void IncreaseQuantity(int quantity)
+    {
+        if (quantity <= 0)
+            throw new ArgumentOutOfRangeException(nameof(quantity), "Quantity must be greater than zero.");
+
+        Quantity += quantity;
+    }
+
+    internal void ChangeQuantity(int newQuantity)
+    {
+        if (newQuantity <= 0)
+            throw new ArgumentOutOfRangeException(nameof(newQuantity), "Quantity must be greater than zero.");
+
+        Quantity = newQuantity;
     }
 }

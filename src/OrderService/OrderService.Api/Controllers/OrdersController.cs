@@ -5,7 +5,6 @@ using OrderService.Application.Commands.FailOrder;
 using OrderService.Application.Commands.PlaceOrder;
 using OrderService.Application.Queries.GetCustomerOrders;
 using OrderService.Application.Queries.GetOrder;
-using OrderService.Domain.Enums;
 
 namespace OrderService.Api.Controllers;
 
@@ -39,16 +38,14 @@ public class OrdersController : ControllerBase
     {
         var orderId = await _mediator.Send(new PlaceOrderCommand(
             request.CustomerId,
-            request.OrderType,
             new PlaceOrderBillingAddress(
                 request.BillingAddress.Street,
                 request.BillingAddress.City,
                 request.BillingAddress.PostalCode,
                 request.BillingAddress.Country),
             request.OrderLines.Select(l => new PlaceOrderLine(
-                l.ApplicationId, l.ApplicationName,
-                l.PlanId, l.PlanName,
-                l.BillingCycle, l.Price, l.Currency)).ToList(),
+                l.ProductId, l.ProductName,
+                l.Quantity, l.Price, l.Currency)).ToList(),
             request.CouponCode), ct);
 
         return CreatedAtAction(nameof(GetById), new { id = orderId }, new { id = orderId });
@@ -75,7 +72,6 @@ public class OrdersController : ControllerBase
 
 public record PlaceOrderRequest(
     Guid CustomerId,
-    OrderType OrderType,
     PlaceOrderAddressRequest BillingAddress,
     List<PlaceOrderLineRequest> OrderLines,
     string? CouponCode);
@@ -83,9 +79,8 @@ public record PlaceOrderRequest(
 public record PlaceOrderAddressRequest(string Street, string City, string PostalCode, string Country);
 
 public record PlaceOrderLineRequest(
-    Guid ApplicationId, string ApplicationName,
-    Guid PlanId, string PlanName,
-    string BillingCycle, decimal Price, string Currency);
+    Guid ProductId, string ProductName,
+    int Quantity, decimal Price, string Currency);
 
 public record ConfirmRequest(string PaymentReference);
 public record FailRequest(string Reason);
